@@ -577,7 +577,6 @@ def getIK(eff_joint_space_current, eff_end, order, arm=None, err=None, itr=None)
      m = -1.0
 
   THE_LIM=np.pi/2.5
-  print(len(eff_joint_space_current))
   if eff_joint_space_current[0] >  THE_LIM:     #xSP max
      eff_joint_space_current[0] =  THE_LIM
   if eff_joint_space_current[0] < -THE_LIM:    #xSP min
@@ -603,7 +602,7 @@ def getIK(eff_joint_space_current, eff_end, order, arm=None, err=None, itr=None)
   A = getFkArm(eff_joint_space_current,arm)
   eff_current = getPosCurrentFromOrder(A,order)
   eff_dist_to_end = getDist2End2(eff_current, eff_end)
-  print(itr_i, ' - ', eff_dist_to_end)
+###############################################  print(itr_i, ' - ', eff_dist_to_end)
   if (itr_i >= itr):
      return (eff_joint_space_current, -1)
 #     return (eff_joint_space_orig, -1)

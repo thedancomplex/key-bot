@@ -19,12 +19,35 @@ NOTE_Z = 2
 VELOS  = 50.0
 TORQUE =  0.50
 
+
+def getPosDeg(the_id=None):
+  if the_id == None:
+    return None
+  try:
+    ids = kbc.state_ids.index(the_id)
+    st = getPosJoints()
+    return st[ids]
+  except:
+    return None
+  return None
+
+def getPosRad(the_id=None):
+  if the_id == None:
+    return None
+  
+  deg = getPosDeg(the_id)
+  rad = kb.deg2rad(deg)
+  return rad
+  
+
+
 def getPosJoints():
   the_out = []
-  for i in range(len(kb.kbar.JOINTS)):
-    the_id = kb.kbar.JOINTS[i]
-    deg = kb.getPosRad(the_id)
-    the_out.append(deg)
+  the_out = kbc.state
+#  for i in range(len(kb.kbar.JOINTS)):
+#    the_id = kb.kbar.JOINTS[i]
+#    deg = kb.getPosRad(the_id)
+#    the_out.append(deg)
   return the_out
 
 def getPos():
@@ -55,7 +78,7 @@ def setIK(val):
   r = [0.0, 0.0, 0.0, 0.0, 0.0]
   for i in range(len(kb.kbar.JOINTS)):
     the_id = kb.kbar.JOINTS[i]
-    deg = kb.getPosDeg(the_id)
+    deg = getPosDeg(the_id)
     d[i] = deg
     r[i] = kb.deg2rad(deg)
   fk = ik.getFkArm(r)
@@ -187,59 +210,70 @@ E5_POS = [0.06210780194098414, -0.00960265585515535, 0.04867928264048951]
 
 # E4
 pos = E4_POS
+pos[1] = pos[1] + -0.005
 up = 0.03
-down = -0.01
+down = -0.05
 name = 'E4'
 notes = addNote( notes, name, pos, up, down )
 
 # F4
 pos = F4_POS
 up = 0.03
-down = -0.01
+down = -0.045
 name = 'F4'
 notes = addNote( notes, name, pos, up, down )
 
 # G4
 pos = G4_POS
+pos[1] = pos[1] + -0.003
+pos[0] = pos[0] + 0.008
 up = 0.03
-down = -0.01
+down = -0.04
 name = 'G4'
 notes = addNote( notes, name, pos, up, down )
 
 
 # A5
 pos = A5_POS
+pos[0] = pos[0] +0.008
+pos[1] = pos[1] -0.005
 up = 0.05
-down = -0.01
+down = -0.055
 name = 'A5'
 notes = addNote( notes, name, pos, up, down )
 
 
 # B5
 pos = B5_POS
+pos[0] = pos[0] + 0.008
+pos[1] = pos[1] + -0.002
 up = 0.05
-down = -0.01
+down = -0.06
 name = 'B5'
 notes = addNote( notes, name, pos, up, down )
 
 # C5
 pos = C5_POS
+pos[0] = pos[0] + 0.012
+pos[1] = pos[1] + -0.002
 up = 0.05
-down = -0.01
+down = -0.06
 name = 'C5'
 notes = addNote( notes, name, pos, up, down )
 
 # D5
 pos = D5_POS
+pos[0] = pos[0] + 0.012
 up = 0.05
-down = -0.01
+down = -0.06
 name = 'D5'
 notes = addNote( notes, name, pos, up, down )
 
 # E5
 pos = D5_POS
+pos[0] = pos[0] + 0.012
 up = 0.05
-down = -0.01
+down = -0.06
 name = 'D5'
 notes = addNote( notes, name, pos, up, down )
 
