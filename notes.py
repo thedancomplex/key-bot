@@ -60,7 +60,7 @@ def getPos():
   p = [ x, y, z ]
   return p
 
-def doOpen():
+def doOpen(T=kbc.TT):
   kb.doOpen()
 
   for i in range(len(kb.kbar.JOINTS)):
@@ -69,7 +69,7 @@ def doOpen():
     kb.setVelosDeg(the_id,VELOS)
     kb.setTorque(the_id,TORQUE)
 
-  return kbc.doStartCtrl(0.05, kb)
+  return kbc.doStartCtrl(T, kb)
 
 
 
@@ -270,11 +270,11 @@ name = 'D5'
 notes = addNote( notes, name, pos, up, down )
 
 # E5
-pos = D5_POS
+pos = E5_POS
 pos[0] = pos[0] + 0.012
 up = 0.05
 down = -0.06
-name = 'D5'
+name = 'E5'
 notes = addNote( notes, name, pos, up, down )
 
 
