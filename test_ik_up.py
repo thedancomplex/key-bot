@@ -10,13 +10,13 @@ for i in range(len(kb.kbar.JOINTS)):
   the_id = kb.kbar.JOINTS[i]
   kb.torqueEnable(the_id)
   kb.setVelosDeg(the_id,50.0)
-  kb.setTorque(the_id,0.50)
+  kb.setTorque(the_id,0.0)
 
 des3 = [0.1131434, -0.16205538, 0.07500772]
 des4 = [des3[0], des3[1]+0.05, des3[2]]
 #des4 = [des3[0], des3[1]+0.05, des3[2]+0.03]
 #des4 = [des3[0], des3[1]+0.05, des3[2]-0.01]
-#des4 = [0.0, 0.0, 0.4]
+des4 = [0.0, 0.0, 0.4]
 
 
 def setIK(val):
@@ -47,24 +47,7 @@ def setIK(val):
   return (ids, degs)
 
 
-OFFSET_UP   = 0.03
-OFFSET_DOWN = -0.01
-T = 1.0
-OFFSET_SIDE = 0.75 * 0.0254
-OFFSET_X    = 0.02
-des4[1] = des4[1] + OFFSET_SIDE*0
-while True:
-  des = copy.deepcopy(des4)
-  des[2] = des[2] + OFFSET_UP
-  ids, degs = setIK(des)
-  print(ids)
-  print(degs)
-  kb.setPosSyncDeg(ids, degs)
-  t.sleep(T/2.0)
-
-  des = copy.deepcopy(des4)
-  des[2] = des[2] + OFFSET_DOWN
-  ids, degs = setIK(des)
-  kb.setPosSyncDeg(ids, degs)
-  t.sleep(T/2.0)
+des = copy.deepcopy(des4)
+ids, degs = setIK(des)
+kb.setPosSyncDeg(ids, degs)
 
