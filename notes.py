@@ -3,7 +3,7 @@ import key_bot_ik as ik
 import key_bot_h as kb
 import time as t
 import copy
-
+import key_bot_ctrl as kbc
 
 
 
@@ -45,7 +45,8 @@ def doOpen():
     kb.torqueEnable(the_id)
     kb.setVelosDeg(the_id,VELOS)
     kb.setTorque(the_id,TORQUE)
-  return 0
+
+  return kbc.doStartCtrl(0.05, kb)
 
 
 
@@ -111,7 +112,11 @@ def setNoteUp(name=None):
     return 1
 
   ids, degs = setIK(val)
-  return kb.setPosSyncDeg(ids, degs)
+
+  kbc.theta = degs
+  kbc.ids   = ids 
+  return 0
+  #return kb.setPosSyncDeg(ids, degs)
 
 def setNoteDown(name=None):
   if name == None:
@@ -122,7 +127,10 @@ def setNoteDown(name=None):
     return 1
 
   ids, degs = setIK(val)
-  return kb.setPosSyncDeg(ids, degs)
+  kbc.theta = degs
+  kbc.ids   = ids 
+  return 0
+  #return kb.setPosSyncDeg(ids, degs)
 
 def getNoteUp(name=None):
   if name == None:
