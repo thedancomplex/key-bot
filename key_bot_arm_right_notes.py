@@ -1,3 +1,5 @@
+import key_bot_ik as ik
+
 C4  = [-55.37109375, 87.01171875, 30.76171875, -27.83203125, -31.0546875]
 C4S = [-59.47265625, 72.94921875, 31.640625, 6.15234375, -34.5703125]
 D4  = [-52.734375, 75.5859375, 31.34765625, 5.2734375, -38.96484375]
@@ -24,6 +26,63 @@ B6F = [29.8828125, 60.9375, 30.17578125, 97.55859375, -98.4375]
 B6  = [26.66015625, 63.8671875, 26.953125, 89.0625, -98.4375]
 C6  = [32.51953125, 65.625, 19.921875, 76.46484375, -77.34375]
 
-NOTES = [C4, C4S, D4, E4F, F4, F4S, G4, G4S, A5, B5F, B5, 
-         C5, C5S, D5, E5F, F5, F5S, G5, G5S, A6, B6F, B6,
+
+xyz     = [0.1131434, -0.16205538, 0.07500772]
+dy      = 0.01
+
+C4_pos  = [xyz[0], xyz[1], xyz[2]]
+C4S_pos = [xyz[0], xyz[1], xyz[2]]
+D4_pos  = [xyz[0], xyz[1], xyz[2]]
+E4F_pos = [xyz[0], xyz[1], xyz[2]]
+E4_pos  = [xyz[0], xyz[1], xyz[2]]
+F4_pos  = [xyz[0], xyz[1], xyz[2]]
+F4S_pos = [xyz[0], xyz[1], xyz[2]]
+G4_pos  = [xyz[0], xyz[1], xyz[2]]
+G4S_pos = [xyz[0], xyz[1], xyz[2]]
+A5_pos  = [xyz[0], xyz[1], xyz[2]]
+B5F_pos = [xyz[0], xyz[1], xyz[2]]
+B5_pos  = [xyz[0], xyz[1], xyz[2]]
+C5_pos  = [xyz[0], xyz[1], xyz[2]]
+C5S_pos = [xyz[0], xyz[1], xyz[2]]
+D5_pos  = [xyz[0], xyz[1], xyz[2]]
+E5F_pos = [xyz[0], xyz[1], xyz[2]]
+E5_pos  = [xyz[0], xyz[1], xyz[2]]
+F5_pos  = [xyz[0], xyz[1], xyz[2]]
+F5S_pos = [xyz[0], xyz[1], xyz[2]]
+G5_pos  = [xyz[0], xyz[1], xyz[2]]
+G5S_pos = [xyz[0], xyz[1], xyz[2]]
+A6_pos  = [xyz[0], xyz[1], xyz[2]]
+B6F_pos = [xyz[0], xyz[1], xyz[2]]
+B6_pos  = [xyz[0], xyz[1], xyz[2]]
+C6_pos  = [xyz[0], xyz[1], xyz[2]]
+
+POS = [C4_pos, C4S_pos, D4_pos, E4F_pos, E4_pos, F4_pos, F4S_pos, G4_pos, G4S_pos, A5_pos, B5F_pos, B5_pos, 
+         C5_pos, C5S_pos, D5_pos, E5F_pos, E5_pos, F5_pos, F5S_pos, G5_pos, G5S_pos, A6_pos, B6F_pos, B6_pos,
+         C6_pos]
+
+for i in range(len(POS)):
+  POS[i][1] = POS[i][1] + dy*i
+
+THETA = [C4, C4S, D4, E4F, E4, F4, F4S, G4, G4S, A5, B5F, B5, 
+
+for i in range(len(POS)):
+  order = ['p_x', 'p_y', 'p_z' ]
+  r = [0.0, 0.0, 0.0, 0.0, 0.0]
+  a = POS[i]
+  ik_theta, stat = ik.getIK(r,a, order)
+
+  THETA[i] = ik_theta
+
+
+
+
+NAMES = ['C4', 'C4S', 'D4', 'E4F', 'E4', 'F4', 'F4S', 'G4', 'G4S', 'A5', 'B5F', 'B5', 
+         'C5', 'C5S', 'D5', 'E5F', 'E5', 'F5', 'F5S', 'G5', 'G5S', 'A6', 'B6F', 'B6',
+         'C6']
+
+NOTES = [C4, C4S, D4, E4F, E4, F4, F4S, G4, G4S, A5, B5F, B5, 
+         C5, C5S, D5, E5F, E5, F5, F5S, G5, G5S, A6, B6F, B6,
          C6]
+
+
+

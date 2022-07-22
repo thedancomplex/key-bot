@@ -409,7 +409,7 @@ def doClose():
   # Close port
   portHandler.closePort()
 
-def setPosSyncDeg(ids=None, degs=None):
+def setPosSyncDeg(ids=None, degs=None, the_dir=kbar.DIR ):
     if(ids == None):
       return 1
     if(degs == None):
@@ -419,11 +419,17 @@ def setPosSyncDeg(ids=None, degs=None):
 
     tick = []
     for i in range(len(ids)):
-      tick.append(deg2tick(degs[i]))
+      the_id = ids[i]
+      ii = kbar.JOINTS.index(the_id)
+      do_dir = the_dir[ii]
+      deg = degs[i]
+      deg = deg * do_dir
+
+      tick.append(deg2tick(deg))
     
     return setPosSyncTick(ids, tick)
 
-def setPosSyncRad(ids=None, degs=None):
+def setPosSyncRad(ids=None, degs=None, the_dir=kbar.DIR):
     if(ids == None):
       return 1
     if(degs == None):
@@ -433,7 +439,13 @@ def setPosSyncRad(ids=None, degs=None):
 
     tick = []
     for i in range(len(ids)):
-      tick.append(rad2tick(degs[i]))
+      the_id = ids[i]
+      ii = kbar.JOINTS.index(the_id)
+      do_dir = the_dir[ii]
+      deg = degs[i]
+      deg = deg * do_dir
+
+      tick.append(rad2tick(deg))
     
     return setPosSyncTick(ids, tick)
 
@@ -454,8 +466,16 @@ def setPosSyncTick(ids=None, degs=None):
             DXL_LOBYTE(the_deg), 
             DXL_HIBYTE(the_deg) 
             ] 
+      print(param_goal_position)
+
+      #param_goal_position = [DXL_LOBYTE(DXL_LOWORD(the_deg)), 
+      #                       DXL_HIBYTE(DXL_LOWORD(the_deg)), 
+      #                       DXL_LOBYTE(DXL_HIWORD(the_deg)), 
+      #                       DXL_HIBYTE(DXL_HIWORD(the_deg))]
+
 
       # Add Dynamixel#1 goal position value to the Syncwrite parameter storage
+      ###dxl_addparam_result = groupSyncWrite.addParam(the_id, param_goal_position)
       dxl_addparam_result = groupSyncWrite.addParam(the_id, param_goal_position)
       if dxl_addparam_result != True:
         print("[ID:%03d] groupSyncWrite addparam failed" % the_id)

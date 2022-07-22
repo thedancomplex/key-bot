@@ -2,7 +2,7 @@ import key_bot_arm_right as kbar
 import key_bot_ik as ik
 import key_bot_h as kb
 import time as t
-
+import numpy as np
 kb.doOpen()
 
 for i in range(len(kb.kbar.JOINTS)):
@@ -28,7 +28,7 @@ z1 = kbar.BAS_OFFSET_Z + kbar.TOP_ROT_TO_ROT_Z + kbar.ROT_TO_ROT + kbar.ROT_TO_R
 des1 = [x1, y1, z1]
 des2 = [0.1, 0.0, 0.15]
 des3 = [0.1131434, -0.16205538, 0.07500772]
-des4 = [des3[0]+0.01, des3[1]+0.01, des3[2]+0.01]
+des4 = [des3[0]+0.01, des3[1]+0.01, des3[2]+0.01, np.pi/2.0]
 while True:
   d = [0.0, 0.0, 0.0, 0.0, 0.0]
   ddd = [0.0, 0.0, 0.0, 0.0, -90.0]
@@ -46,7 +46,7 @@ while True:
   a = [ 0.15, 0.000, df]
   a = des4
   #ik_theta = ik.getIK3dof(r,a) 
-  order = ['p_x', 'p_y', 'p_z' ]
+  order = ['p_x', 'p_y', 'p_z', 't_x' ]
   tick = t.time()
   ik_theta, stat = ik.getIK(r,a, order) 
   tock = t.time()

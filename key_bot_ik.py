@@ -532,9 +532,9 @@ def getIK(eff_joint_space_current, eff_end, order, arm=None, err=None, itr=None)
  if itr == None:
     itr = 100
  eff_joint_space_orig = copy.deepcopy(eff_joint_space_current)
- eff_delta_theta = 0.05 # change in goal in meters
- eff_delta_xyz = 0.05 # change in goal in meters
- eff_err_max = 0.001
+ eff_delta_theta = 0.005 # change in goal in meters
+ eff_delta_xyz = 0.005 # change in goal in meters
+ eff_err_max = 0.003
 
  if (err is not None):
   eff_delta_theta = err[0] # change in goal in rad
