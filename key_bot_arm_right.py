@@ -1,0 +1,24 @@
+J0=4
+J1=7
+J2=17
+J3=1
+J4=13
+
+UNIT_CONVERT = 0.0254
+
+JOINTS=[J0,    J1,   J2,   J3,   J4]
+DIR   =[1.0, -1.0, -1.0, -1.0, -1.0]
+
+BAS_OFFSET_Z = (3.0 + 7.0/8.0) * UNIT_CONVERT
+BAS_OFFSET_Y = (0.0) * UNIT_CONVERT
+ROT_TO_ROT = (2.0 + 5.0/8.0) * UNIT_CONVERT
+TOP_ROT_TO_ROT_Z = (3.0 + 1.0/2.0) * UNIT_CONVERT
+TOP_ROT_TO_ROT_X = (0.0 + 1.0/2.0) * UNIT_CONVERT
+EEF_OFFSET_Z = (0.0 + 5.0/16.0) * UNIT_CONVERT
+EEF_OFFSET_X = (3.0 + 1.0/8.0) * UNIT_CONVERT
+
+#between
+# 2 and 5/8 in
+
+# Bottom
+# 3 and 7/8 in
