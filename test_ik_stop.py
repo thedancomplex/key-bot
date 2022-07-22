@@ -10,7 +10,7 @@ for i in range(len(kb.kbar.JOINTS)):
   the_id = kb.kbar.JOINTS[i]
   kb.torqueEnable(the_id)
   kb.setVelosDeg(the_id,50.0)
-  kb.setTorque(the_id,0.50)
+  kb.setTorque(the_id,0.0)
 
 des3 = [0.1131434, -0.16205538, 0.07500772]
 des4 = [des3[0], des3[1]+0.05, des3[2]]
@@ -43,6 +43,7 @@ def setIK(val):
     #deg = notes.C4[i]
     deg = kb.rad2deg(ik_theta[i])
     #kb.setPosDeg(the_id, deg)
+    deg = 0.0
     degs.append(deg)
   return (ids, degs)
 

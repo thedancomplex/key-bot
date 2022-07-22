@@ -43,6 +43,7 @@ def setIK(val):
     #deg = notes.C4[i]
     deg = kb.rad2deg(ik_theta[i])
     #kb.setPosDeg(the_id, deg)
+    deg = 0.0
     degs.append(deg)
   return (ids, degs)
 

@@ -1,8 +1,84 @@
+import key_bot_arm_right as kbar
 import key_bot_ik as ik
+import key_bot_h as kb
+import time as t
+import copy
+
+
+
+
 NOTE_NAME = 0
-NOTE_XYZ  = 1
+NOTE_POS  = 1
 NOTE_UP   = 2
 NOTE_DOWN = 3
+NOTE_X = 0
+NOTE_Y = 1
+NOTE_Z = 2
+
+
+VELOS  = 50.0
+TORQUE =  0.50
+
+def getPosJoints():
+  the_out = []
+  for i in range(len(kb.kbar.JOINTS)):
+    the_id = kb.kbar.JOINTS[i]
+    deg = kb.getPosRad(the_id)
+    the_out.append(deg)
+  return the_out
+
+def getPos():
+#  A = ik.getA(val)
+  val = getPosJoints()
+  A = ik.getFkArm(val)
+  x = A[0,3]
+  y = A[1,3]
+  z = A[2,3]
+  p = [ x, y, z ]
+  return p
+
+def doOpen():
+  kb.doOpen()
+
+  for i in range(len(kb.kbar.JOINTS)):
+    the_id = kb.kbar.JOINTS[i]
+    kb.torqueEnable(the_id)
+    kb.setVelosDeg(the_id,VELOS)
+    kb.setTorque(the_id,TORQUE)
+  return 0
+
+
+
+def setIK(val):
+  d = [0.0, 0.0, 0.0, 0.0, 0.0]
+  r = [0.0, 0.0, 0.0, 0.0, 0.0]
+  for i in range(len(kb.kbar.JOINTS)):
+    the_id = kb.kbar.JOINTS[i]
+    deg = kb.getPosDeg(the_id)
+    d[i] = deg
+    r[i] = kb.deg2rad(deg)
+  fk = ik.getFkArm(r)
+  a = val
+  order = ['p_x', 'p_y', 'p_z' ]
+  tick = t.time()
+  ik_theta, stat = ik.getIK(r,a, order)
+  tock = t.time()
+  print(tock-tick)
+  print(ik_theta)
+  ids  = []
+  degs = []
+  for i in range(len(kb.kbar.JOINTS)):
+    the_id = kb.kbar.JOINTS[i]
+    ids.append(the_id)
+    #deg = notes.C4[i]
+    deg = kb.rad2deg(ik_theta[i])
+    #kb.setPosDeg(the_id, deg)
+    degs.append(deg)
+  return (ids, degs)
+
+
+
+
 
 def addNote(notes=[], name=None, pos=None, pos_up=None, pos_down=None):
   if name == None:
@@ -13,15 +89,64 @@ def addNote(notes=[], name=None, pos=None, pos_up=None, pos_down=None):
     return 1
   if pos_down == None:
     return 1
-  note = []
-  note.append(name)
-  note.append(pos)
-  note.append(pos_up)
-  note.append(pos_down)
+  note      = []
+  cname     = copy.deepcopy(name)
+  cpos      = copy.deepcopy(pos)
+  cpos_up   = copy.deepcopy(pos_up)
+  cpos_down = copy.deepcopy(pos_down)
+  note.append(cname)
+  note.append(cpos)
+  note.append(cpos_up)
+  note.append(cpos_down)
 
   notes.append(note)
   return notes
 
+def setNoteUp(name=None):
+  if name == None:
+    return 1
+
+  val = getNoteUp(name)
+  if val == 1:
+    return 1
+
+  ids, degs = setIK(val)
+  return kb.setPosSyncDeg(ids, degs)
+
+def setNoteDown(name=None):
+  if name == None:
+    return 1
+
+  val = getNoteDown(name)
+  if val == 1:
+    return 1
+
+  ids, degs = setIK(val)
+  return kb.setPosSyncDeg(ids, degs)
+
+def getNoteUp(name=None):
+  if name == None:
+    return 1
+  val = getNote(name)
+
+  if val == 1:
+    return 1
+
+  pos = val[NOTE_POS]
+  pos[NOTE_Z] = pos[NOTE_Z] + val[NOTE_UP]
+  return pos
+
+def getNoteDown(name=None):
+  if name == None:
+    return 1
+  val = getNote(name)
+
+  if val == 1:
+    return 1
+
+  pos = val[NOTE_POS]
+  pos[NOTE_Z] = pos[NOTE_Z] + val[NOTE_DOWN]
+  return pos
 
 def getNote(name=None):
   if name == None:
@@ -39,12 +164,79 @@ def getNote(name=None):
     
 
 notes = []
-notes = addNote( notes , 'up', [ 0.0, 0.0, 0.4], 0.03, -0.01 )
+notes = addNote( notes , 'UP', [ 0.0, 0.0, 0.4], 0.0, 0.0 )
 
-pos = [0.1131434, -0.16205538, 0.07500772]
+
+E4_POS = [0.1087854110279702, -0.12875151458441686, 0.0785395050070696]
+F4_POS = [0.09449643711508654, -0.10512175090980098, 0.06721989461110456]
+G4_POS = [0.08084612098943962, -0.07792320175266998, 0.05301969529617176]
+A5_POS = [0.07489533442285769, -0.06185051762398291, 0.04557337687149318]
+B5_POS = [0.075394440198049, -0.04806769522583378, 0.04851158383899397]
+C5_POS = [0.06672520004447989, -0.03392945445638974, 0.04747836898712067]
+D5_POS = [0.06414436257324459, -0.02140892655152586, 0.04848650624678778]
+E5_POS = [0.06210780194098414, -0.00960265585515535, 0.04867928264048951]
+
+
+# E4
+pos = E4_POS
 up = 0.03
 down = -0.01
-notes = addNote( notes, 'F4', pos, up, down )
+name = 'E4'
+notes = addNote( notes, name, pos, up, down )
+
+# F4
+pos = F4_POS
+up = 0.03
+down = -0.01
+name = 'F4'
+notes = addNote( notes, name, pos, up, down )
+
+# G4
+pos = G4_POS
+up = 0.03
+down = -0.01
+name = 'G4'
+notes = addNote( notes, name, pos, up, down )
+
+
+# A5
+pos = A5_POS
+up = 0.05
+down = -0.01
+name = 'A5'
+notes = addNote( notes, name, pos, up, down )
+
+
+# B5
+pos = B5_POS
+up = 0.05
+down = -0.01
+name = 'B5'
+notes = addNote( notes, name, pos, up, down )
+
+# C5
+pos = C5_POS
+up = 0.05
+down = -0.01
+name = 'C5'
+notes = addNote( notes, name, pos, up, down )
+
+# D5
+pos = D5_POS
+up = 0.05
+down = -0.01
+name = 'D5'
+notes = addNote( notes, name, pos, up, down )
+
+# E5
+pos = D5_POS
+up = 0.05
+down = -0.01
+name = 'D5'
+notes = addNote( notes, name, pos, up, down )
+
+
+
 
 C4  = [-55.37109375, 87.01171875, 30.76171875, -27.83203125, -31.0546875]
 C4S = [-59.47265625, 72.94921875, 31.640625, 6.15234375, -34.5703125]
