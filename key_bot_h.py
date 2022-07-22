@@ -466,7 +466,6 @@ def setPosSyncTick(ids=None, degs=None):
             DXL_LOBYTE(the_deg), 
             DXL_HIBYTE(the_deg) 
             ] 
-      print(param_goal_position)
 
       #param_goal_position = [DXL_LOBYTE(DXL_LOWORD(the_deg)), 
       #                       DXL_HIBYTE(DXL_LOWORD(the_deg)), 
