@@ -150,7 +150,200 @@ def getJacobian6x3(d0,dt,arm):
         J[i,j] = (A1[i,3] - A0[i,3])/dt
   return J   
 
+import multiprocessing
 
+
+mp_d0 = None
+mp_order = None
+mp_dt = None
+mp_arm = None
+def getJacobianMult(d0, order, dt, arm):
+  global mp_d0
+  global mp_order
+  global mp_dt
+  global mp_arm
+
+  mp_d0 = d0
+  mp_order = order
+  mp_dt = dt
+  mp_arm = arm
+
+  pool_obj = multiprocessing.Pool()
+  xyz = len(order)
+  J = pool_obj.map(getJacobianXYZ, range(xyz))
+  return J
+
+#def getJacobianXYZ(d0,order,dt,arm,i):
+def getJacobianXYZ(i):
+  global mp_d0
+  global mp_order
+  global mp_dt
+  global mp_arm
+  d0 = mp_d0
+  order = mp_order
+  dt = mp_dt
+  arm = mp_arm
+  # gets numerical jacobian of 'arm'
+  # d0 is the current position of the arm
+  # order is the order of the desired joints [x, y, z, t_x, t_y, t_z]
+  #                                          [x, y, z, t_x]
+  #                                          [x, y, z, t_z]
+  #                                          [x, y, z, t_y, t_z]
+  #                                          Etc.
+
+  # Jacobian or size dof x order
+  xyz = len(order)
+  dof = len(d0)
+  J = np.zeros((xyz,dof))
+  # J[ row, col ] 
+#  d0 = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] 
+
+  A0 = getFkArm(d0,arm)
+  #for i in range(xyz):
+  for j in range(dof):
+#        d0 = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        d1 = copy.deepcopy(d0)
+        d1[j] = d0[j] + dt
+###        A0 = getFkArm(d0,arm)
+        A1 = getFkArm(d1,arm)
+        if order[i] == 'p_x':
+          J[i,j] = (A1[0,3] - A0[0,3])/dt
+        elif order[i] == 'p_y':
+          J[i,j] = (A1[1,3] - A0[1,3])/dt
+        elif order[i] == 'p_z':
+          J[i,j] = (A1[2,3] - A0[2,3])/dt
+        elif order[i] == 't_x':
+          a0 = getRot(A0,'x')
+          a1 = getRot(A1,'x')
+          J[i,j] = (a1-a0)/dt
+        elif order[i] == 't_y':
+          a0 = getRot(A0,'y')
+          a1 = getRot(A1,'y')
+          J[i,j] = (a1-a0)/dt
+        elif order[i] == 't_z':
+          a0 = getRot(A0,'z')
+          a1 = getRot(A1,'z')
+          J[i,j] = (a1-a0)/dt
+  return J   
+
+
+from parfor import parfor
+def getJacobianParFor(d0,order,dt,arm):
+  # gets numerical jacobian of 'arm'
+  # d0 is the current position of the arm
+  # order is the order of the desired joints [x, y, z, t_x, t_y, t_z]
+  #                                          [x, y, z, t_x]
+  #                                          [x, y, z, t_z]
+  #                                          [x, y, z, t_y, t_z]
+  #                                          Etc.
+
+  # Jacobian or size dof x order
+  xyz = len(order)
+  dof = len(d0)
+  J = np.zeros((xyz,dof))
+  # J[ row, col ] 
+#  d0 = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] 
+
+  A0 = getFkArm(d0,arm)
+  @parfor((range(xyz)), (range(dof)))
+  def fun(i, a):
+####  for i in range(xyz):
+###     for j in range(dof):
+#        d0 = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        d1 = copy.deepcopy(d0)
+        d1[j] = d0[j] + dt
+###        A0 = getFkArm(d0,arm)
+        A1 = getFkArm(d1,arm)
+        if order[i] == 'p_x':
+          J[i,j] = (A1[0,3] - A0[0,3])/dt
+        elif order[i] == 'p_y':
+          J[i,j] = (A1[1,3] - A0[1,3])/dt
+        elif order[i] == 'p_z':
+          J[i,j] = (A1[2,3] - A0[2,3])/dt
+        elif order[i] == 't_x':
+          a0 = getRot(A0,'x')
+          a1 = getRot(A1,'x')
+          J[i,j] = (a1-a0)/dt
+        elif order[i] == 't_y':
+          a0 = getRot(A0,'y')
+          a1 = getRot(A1,'y')
+          J[i,j] = (a1-a0)/dt
+        elif order[i] == 't_z':
+          a0 = getRot(A0,'z')
+          a1 = getRot(A1,'z')
+          J[i,j] = (a1-a0)/dt
+        return J
+  return fun   
+
+import _thread
+saved_A0 = None
+JJ = []
+thread_num = 0
+def getJacobianThread(d0,order,dt,arm):
+  global saved_A0
+  global JJ
+  global thread_num
+  thread_num = 0
+  # gets numerical jacobian of 'arm'
+  # d0 is the current position of the arm
+  # order is the order of the desired joints [x, y, z, t_x, t_y, t_z]
+  #                                          [x, y, z, t_x]
+  #                                          [x, y, z, t_z]
+  #                                          [x, y, z, t_y, t_z]
+  #                                          Etc.
+
+  # Jacobian or size dof x order
+  xyz = len(order)
+  dof = len(d0)
+  J = np.zeros((xyz,dof))
+  # J[ row, col ] 
+#  d0 = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] 
+
+  A0 = getFkArm(d0,arm)
+  saved_A0 = A0
+  for i in range(xyz):
+    JJ.append(J)
+
+  for i in range(xyz):
+    _thread.start_new_thread(getJacobianThread, (i, J, dof,d0,dt,arm,order))
+  
+  while (thread_num < xyz):
+    for i in range(xyz):
+      J = J + JJ[i]
+  return J   
+
+
+def getJacobianThread(i, J, dof,d0,dt,arm,order):
+     global thread_num
+     global JJ
+#  for i in range(xyz):
+     A0 = saved_A0
+     for j in range(dof):
+#        d0 = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        d1 = copy.deepcopy(d0)
+        d1[j] = d0[j] + dt
+###        A0 = getFkArm(d0,arm)
+        A1 = getFkArm(d1,arm)
+        if order[i] == 'p_x':
+          J[i,j] = (A1[0,3] - A0[0,3])/dt
+        elif order[i] == 'p_y':
+          J[i,j] = (A1[1,3] - A0[1,3])/dt
+        elif order[i] == 'p_z':
+          J[i,j] = (A1[2,3] - A0[2,3])/dt
+        elif order[i] == 't_x':
+          a0 = getRot(A0,'x')
+          a1 = getRot(A1,'x')
+          J[i,j] = (a1-a0)/dt
+        elif order[i] == 't_y':
+          a0 = getRot(A0,'y')
+          a1 = getRot(A1,'y')
+          J[i,j] = (a1-a0)/dt
+        elif order[i] == 't_z':
+          a0 = getRot(A0,'z')
+          a1 = getRot(A1,'z')
+          J[i,j] = (a1-a0)/dt
+     JJ[i] = J
+     thread_num = thread_num + 1
 
 def getJacobian(d0,order,dt,arm):
   # gets numerical jacobian of 'arm'
@@ -384,6 +577,7 @@ def getIK(eff_joint_space_current, eff_end, order, arm=None, err=None, itr=None)
      m = -1.0
 
   THE_LIM=np.pi/2.5
+  print(len(eff_joint_space_current))
   if eff_joint_space_current[0] >  THE_LIM:     #xSP max
      eff_joint_space_current[0] =  THE_LIM
   if eff_joint_space_current[0] < -THE_LIM:    #xSP min
